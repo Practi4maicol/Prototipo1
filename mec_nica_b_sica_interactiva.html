@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mecánica Básica Educativa e Interactiva | Ldo. Pablo Ramos</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            950: '#090d16',
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155'
+                        },
+                        cyan: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2'
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white">
+
+    <!-- Top Navigation / Gamification Bar -->
+    <header class="bg-dark-900 border-b border-dark-700 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-cyan-500/10 p-2.5 rounded-xl border border-cyan-500/30 text-cyan-400 text-xl">
+                    <i class="fa-solid fa-car-rear"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white tracking-wide">Mecánica Básica <span class="text-xs px-2 py-0.5 bg-cyan-950 border border-cyan-600 text-cyan-300 rounded-full ml-2">2024-2025</span></h1>
+                    <p class="text-xs text-slate-400">Docente: Ldo. Pablo Ramos | Formación de Conductores</p>
+                </div>
+            </div>
+
+            <!-- Gamification Stats -->
+            <div class="flex items-center space-x-4 bg-dark-800/80 px-4 py-2 rounded-xl border border-dark-700 shadow-inner">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span class="text-xs text-slate-300">Nivel: <strong id="userLevel" class="text-amber-400">1</strong></span>
+                </div>
+                <div class="h-4 w-px bg-dark-700"></div>
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-bolt text-cyan-400"></i>
+                    <span class="text-xs text-slate-300">XP: <strong id="userXP" class="text-cyan-400">100</strong> pts</span>
+                </div>
+                <button onclick="reiniciarProgreso()" title="Reiniciar Progreso" class="text-slate-400 hover:text-red-400 transition text-xs ml-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- Notification Banner -->
+        <div id="notificationBanner" class="hidden bg-emerald-950/80 border border-emerald-500 text-emerald-200 px-4 py-3 rounded-xl text-sm flex items-center justify-between shadow-lg transition-all animate-pulse">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                <span id="notificationText">¡Progreso guardado exitosamente!</span>
+            </div>
+            <button onclick="ocultarNotificacion()" class="text-emerald-400 hover:text-white">&times;</button>
+        </div>
+
+        <!-- Module Navigation Tabs -->
+        <nav class="flex overflow-x-auto space-x-2 pb-2 scrollbar-none border-b border-dark-700">
+            <button onclick="cambiarModulo(1)" id="tab-1" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm whitespace-nowrap transition bg-cyan-600 text-white shadow-lg shadow-cyan-900/50 flex items-center space-x-2">
+                <i class="fa-solid fa-gauge"></i> <span>1. Componentes & Tablero</span>
+            </button>
+            <button onclick="cambiarModulo(2)" id="tab-2" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm whitespace-nowrap transition bg-dark-800 text-slate-400 hover:bg-dark-700 hover:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-gears"></i> <span>2. Motor & Sistemas</span>
+            </button>
+            <button onclick="cambiarModulo(3)" id="tab-3" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm whitespace-nowrap transition bg-dark-800 text-slate-400 hover:bg-dark-700 hover:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-screwdriver-wrench"></i> <span>3. Mantenimiento & Transmisión</span>
+            </button>
+            <button onclick="cambiarModulo(4)" id="tab-4" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm whitespace-nowrap transition bg-dark-800 text-slate-400 hover:bg-dark-700 hover:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-circle-dot"></i> <span>4. Neumáticos & Suspensión</span>
+            </button>
+            <button onclick="cambiarModulo(5)" id="tab-5" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm whitespace-nowrap transition bg-dark-800 text-slate-400 hover:bg-dark-700 hover:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-smog"></i> <span>5. Opacidad & Gases</span>
+            </button>
+            <button onclick="cambiarModulo(6)" id="tab-6" class="tab-btn px-4 py-2.5 rounded-xl font-medium text-sm whitespace-nowrap transition bg-dark-800 text-slate-400 hover:bg-dark-700 hover:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-brain"></i> <span>6. Trivia Gamificada</span>
+            </button>
+        </nav>
+
+        <!-- MODULE 1: Componentes y Tablero -->
+        <section id="modulo-1" class="module-content space-y-6">
+            <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Módulo 1 de 5</span>
+                    <h2 class="text-2xl font-bold text-white mt-1 mb-2">Componentes del Vehículo y Tablero de Instrumentos</h2>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Estudio de la definición de automóvil, distinción estructural entre chasis y carrocería, vistas del vehículo y el panel de control. Haz clic en las luces testigo del simulador para comprender sus alertas y acciones defensivas obligatorias.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interactive Dashboard Simulator -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Lights Grid -->
+                <div class="lg:col-span-1 bg-dark-900 border border-dark-700 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-semibold text-slate-200 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-400"></i> Panel de Luces Testigo
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="seleccionarTestigo('temperatura')" id="btn-temperatura" class="testigo-btn p-4 rounded-xl border border-cyan-500 bg-cyan-950/40 flex flex-col items-center justify-center transition hover:scale-105">
+                                <span class="text-3xl mb-1">🌡️</span>
+                                <span class="text-xs font-medium text-slate-200">Temperatura</span>
+                            </button>
+                            <button onclick="seleccionarTestigo('aceite')" id="btn-aceite" class="testigo-btn p-4 rounded-xl border border-dark-700 bg-dark-800 flex flex-col items-center justify-center transition hover:scale-105">
+                                <span class="text-3xl mb-1">🛢️</span>
+                                <span class="text-xs font-medium text-slate-200">Presión Aceite</span>
+                            </button>
+                            <button onclick="seleccionarTestigo('bateria')" id="btn-bateria" class="testigo-btn p-4 rounded-xl border border-dark-700 bg-dark-800 flex flex-col items-center justify-center transition hover:scale-105">
+                                <span class="text-3xl mb-1">🔋</span>
+                                <span class="text-xs font-medium text-slate-200">Batería / Carga</span>
+                            </button>
+                            <button onclick="seleccionarTestigo('frenos')" id="btn-frenos" class="testigo-btn p-4 rounded-xl border border-dark-700 bg-dark-800 flex flex-col items-center justify-center transition hover:scale-105">
+                                <span class="text-3xl mb-1">🛑</span>
+                                <span class="text-xs font-medium text-slate-200">Frenos / ABS</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-xs text-slate-400 bg-dark-950 p-3 rounded-xl border border-dark-800">
+                        💡 <strong>Consejo del Ldo. Pablo Ramos:</strong> Las luces rojas indican peligro inminente y exigen detener la marcha de inmediato.
+                    </div>
+                </div>
+
+                <!-- Theory Details Card -->
+                <div class="lg:col-span-2 bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <div id="testigoDetalle">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <span id="detalleIcono" class="text-3xl">🌡️</span>
+                            <div>
+                                <h3 id="detalleTitulo" class="text-xl font-bold text-cyan-400">Temperatura del Motor</h3>
+                                <p class="text-xs text-slate-400">Indicador crítico de refrigeración</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4 text-sm text-slate-300">
+                            <div class="bg-dark-950 p-4 rounded-xl border border-dark-800">
+                                <strong class="text-cyan-400 block mb-1">Fundamento Teórico:</strong>
+                                <p id="detalleTeoria">Monitorea la temperatura del líquido refrigerante. El rango óptimo de funcionamiento se encuentra entre 80°C y 100°C.</p>
+                            </div>
+                            <div class="bg-dark-950 p-4 rounded-xl border border-dark-800">
+                                <strong class="text-amber-400 block mb-1">Posible Falla:</strong>
+                                <p id="detalleFalla">Fuga en mangueras, nivel bajo de refrigerante o fallo en el termostato y electroventilador.</p>
+                            </div>
+                            <div class="bg-dark-950 p-4 rounded-xl border border-dark-800">
+                                <strong class="text-emerald-400 block mb-1">Acción Correctiva (Defensiva):</strong>
+                                <p id="detalleAccion">Apagar el motor inmediatamente. NUNCA abrir la tapa del radiador en caliente (riesgo de quemaduras severas por vapor).</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-dark-700 flex justify-end">
+                        <button onclick="completarSeccion(1)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-emerald-900/40 flex items-center space-x-2">
+                            <i class="fa-solid fa-check"></i> <span>Marcar Módulo 1 Completado (+20 XP)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 2: Motor y Sistemas Principales -->
+        <section id="modulo-2" class="module-content hidden space-y-6">
+            <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl">
+                <span class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Módulo 2 de 5</span>
+                <h2 class="text-2xl font-bold text-white mt-1 mb-2">Motor y Sistemas Principales</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Comprensión de las partes fijas/móviles, las 4 fases del ciclo del motor, diferencias de octanajes (Extra vs Súper), tipos de filtros y aceites de lubricación SAE.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Phase 1 -->
+                <div class="bg-dark-900 border border-dark-700 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="text-cyan-400 font-bold text-lg mb-1">1. Admisión</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">El pistón baja, la válvula de admisión se abre y permite el ingreso de la mezcla de aire y combustible al cilindro.</p>
+                    </div>
+                    <div class="mt-4 text-xs bg-dark-950 p-2.5 rounded-lg border border-dark-800 text-slate-400">
+                        🔄 Válvula Admisión: Abierta
+                    </div>
+                </div>
+                <!-- Phase 2 -->
+                <div class="bg-dark-900 border border-dark-700 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="text-cyan-400 font-bold text-lg mb-1">2. Compresión</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">El pistón sube comprimiendo herméticamente la mezcla aire-combustible en la cámara superior.</p>
+                    </div>
+                    <div class="mt-4 text-xs bg-dark-950 p-2.5 rounded-lg border border-dark-800 text-slate-400">
+                        🔒 Ambas válvulas cerradas
+                    </div>
+                </div>
+                <!-- Phase 3 -->
+                <div class="bg-dark-900 border border-dark-700 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="text-amber-400 font-bold text-lg mb-1">3. Explosión / Trabajo</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">La bujía genera chispa, provocando la combustión que empuja violentamente el pistón hacia abajo generando fuerza motriz.</p>
+                    </div>
+                    <div class="mt-4 text-xs bg-dark-950 p-2.5 rounded-lg border border-dark-800 text-slate-400">
+                        ⚡ Generación de Potencia
+                    </div>
+                </div>
+                <!-- Phase 4 -->
+                <div class="bg-dark-900 border border-dark-700 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="text-cyan-400 font-bold text-lg mb-1">4. Escape</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">El pistón sube nuevamente y la válvula de escape se abre para expulsar los gases quemados hacia el sistema de escape.</p>
+                    </div>
+                    <div class="mt-4 text-xs bg-dark-950 p-2.5 rounded-lg border border-dark-800 text-slate-400">
+                        💨 Válvula Escape: Abierta
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extra info cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-3">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-gas-pump text-cyan-400"></i> Octanajes (Extra vs Súper) y Filtros
+                    </h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        El octanaje mide la resistencia del combustible a la detonación prematura. La gasolina Súper posee mayor octanaje, recomendada para motores de alta compresión. Los filtros (aire, combustible y aceite) deben reemplazarse periódicamente para evitar impurezas y proteger la vida útil del motor.
+                    </p>
+                </div>
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-3">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-oil-can text-cyan-400"></i> Sistema de Lubricación y Viscosidad SAE
+                    </h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Los aceites con clasificación SAE (Society of Automotive Engineers) determinan la viscosidad. Los multigrados (ej. 10W-30 o 20W-50) garantizan una correcta lubricación tanto en frío al arrancar como en caliente bajo régimen de trabajo severo.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="completarSeccion(2)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-emerald-900/40 flex items-center space-x-2">
+                    <i class="fa-solid fa-check"></i> <span>Marcar Módulo 2 Completado (+20 XP)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- MODULE 3: Mantenimiento y Transmisión -->
+        <section id="modulo-3" class="module-content hidden space-y-6">
+            <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl">
+                <span class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Módulo 3 de 5</span>
+                <h2 class="text-2xl font-bold text-white mt-1 mb-2">Mantenimiento, Transmisión y Refrigeración</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Funcionamiento del sistema de refrigeración (mezcla 50-50), transmisión (embrague, caja de cambios y diferencial) y cálculo interactivo de revisiones por kilometraje.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Maintenance Calculator -->
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-4">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-cyan-400"></i> Simulador de Mantenimiento por Kilometraje
+                    </h3>
+                    <p class="text-xs text-slate-400">Ingrese el kilometraje actual de su vehículo para conocer los mantenimientos preventivos requeridos:</p>
+                    
+                    <div class="flex space-x-3">
+                        <input type="number" id="inputKm" placeholder="Ej. 5000" class="flex-grow bg-dark-950 border border-dark-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500">
+                        <button onclick="calcularMantenimiento()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-cyan-900/40">
+                            Consultar
+                        </button>
+                    </div>
+
+                    <div id="resultadoMantenimiento" class="bg-dark-950 p-4 rounded-xl border border-dark-800 text-sm text-slate-300 min-h-[100px] flex items-center justify-center text-center text-slate-500">
+                        Ingrese un kilometraje para ver la pauta técnica correspondiente.
+                    </div>
+                </div>
+
+                <!-- Transmission & Refrigeration Info -->
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-4">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-gears text-cyan-400"></i> Transmisión y Sistema de Refrigeración
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="bg-dark-950 p-3 rounded-xl border border-dark-800 flex items-start space-x-3">
+                            <i class="fa-solid fa-snowflake text-cyan-400 mt-1"></i>
+                            <div>
+                                <strong class="text-white">Refrigeración (50-50):</strong> Empleo de líquido refrigerante y agua destilada en partes iguales para evitar congelamiento y ebullición prematura.
+                            </div>
+                        </li>
+                        <li class="bg-dark-950 p-3 rounded-xl border border-dark-800 flex items-start space-x-3">
+                            <i class="fa-solid fa-link text-cyan-400 mt-1"></i>
+                            <div>
+                                <strong class="text-white">Embrague & Caja:</strong> Acopla y desacopla la fuerza del motor hacia las ruedas mediante la caja de cambios y el diferencial.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="completarSeccion(3)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-emerald-900/40 flex items-center space-x-2">
+                    <i class="fa-solid fa-check"></i> <span>Marcar Módulo 3 Completado (+20 XP)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- MODULE 4: Neumáticos, Dirección y Suspensión -->
+        <section id="modulo-4" class="module-content hidden space-y-6">
+            <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl">
+                <span class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Módulo 4 de 5</span>
+                <h2 class="text-2xl font-bold text-white mt-1 mb-2">Neumáticos, Dirección y Suspensión</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Técnicas de alineación (TOE y ángulo camber), balanceo para eliminar vibraciones entre 60 y 80 km/h, prueba de desgaste con moneda de un dólar ($1) y mantenimiento de baterías.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-3">
+                    <div class="text-cyan-400 text-2xl mb-2"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                    <h3 class="text-lg font-semibold text-white">Alineación y Ángulos</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Controla la geometría de las ruedas. La convergencia/divergencia (TOE) y el ángulo camber evitan el desgaste irregular de los neumáticos y desvíos en la dirección.
+                    </p>
+                </div>
+
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-3">
+                    <div class="text-cyan-400 text-2xl mb-2"><i class="fa-solid fa-gauge-high"></i></div>
+                    <h3 class="text-lg font-semibold text-white">Balanceo (60-80 Km/h)</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Si experimenta vibraciones en el volante en el rango de 60 a 80 Km/h, las ruedas delanteras requieren un balanceo inmediato para equilibrar masas.
+                    </p>
+                </div>
+
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-3">
+                    <div class="text-cyan-400 text-2xl mb-2"><i class="fa-solid fa-coins"></i></div>
+                    <h3 class="text-lg font-semibold text-white">Prueba del Dólar ($1)</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Inserta una moneda de un dólar en las ranuras principales de la banda de rodamiento. Si la cabeza de Washington queda visible, el neumático debe reemplazarse por seguridad.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="completarSeccion(4)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-emerald-900/40 flex items-center space-x-2">
+                    <i class="fa-solid fa-check"></i> <span>Marcar Módulo 4 Completado (+20 XP)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- MODULE 5: Opacidad y Gases de Escape -->
+        <section id="modulo-5" class="module-content hidden space-y-6">
+            <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl">
+                <span class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Módulo 5 de 5</span>
+                <h2 class="text-2xl font-bold text-white mt-1 mb-2">Opacidad y Gases de Escape</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Normativa legal ecuatoriana (Art. 235 de la Ley de Tránsito sobre opacidad máxima), uso técnico del opacímetro, escala de Ringelmann y función del convertidor catalítico.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-3">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-scale-balanced text-cyan-400"></i> Normativa Legal (Art. 235)
+                    </h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Regula los límites máximos permisibles de emisiones contaminantes en vehículos de combustión interna. El incumplimiento genera sanciones en la revisión técnica vehicular (RTV) y multas económicas.
+                    </p>
+                </div>
+
+                <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-3">
+                    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-microchip text-cyan-400"></i> Opacímetro y Convertidor Catalítico
+                    </h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        El opacímetro mide el nivel de opacidad (humo y partículas suspendidas). El convertidor catalítico transforma gases altamente nocivos como el monóxido de carbono (CO) en elementos menos perjudiciales antes de salir por el silenciador.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="completarSeccion(5)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-emerald-900/40 flex items-center space-x-2">
+                    <i class="fa-solid fa-check"></i> <span>Marcar Módulo 5 Completado (+20 XP)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- MODULE 6: Trivia Gamificada -->
+        <section id="modulo-6" class="module-content hidden space-y-6">
+            <div class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl">
+                <span class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Evaluación Formativa</span>
+                <h2 class="text-2xl font-bold text-white mt-1 mb-2">Trivia Gamificada de Mecánica Básica</h2>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Pon a prueba tus conocimientos teóricos y defensivos adquiridos en los 5 módulos oficiales. ¡Gana puntos XP por cada respuesta correcta!
+                </p>
+            </div>
+
+            <div id="quizContainer" class="bg-dark-900 border border-dark-700 p-6 rounded-2xl shadow-xl space-y-6 max-w-2xl mx-auto">
+                <div class="flex justify-between items-center text-sm text-slate-400 border-b border-dark-700 pb-3">
+                    <span id="quizPreguntaNum">Pregunta 1 de 5</span>
+                    <span id="quizPuntajeActual" class="text-cyan-400 font-semibold">Puntaje: 0 pts</span>
+                </div>
+
+                <div id="quizPreguntaTexto" class="text-lg font-semibold text-white">
+                    ¿Qué indica una luz roja de advertencia de aceite encendida en el tablero con el motor en marcha?
+                </div>
+
+                <div id="quizOpciones" class="space-y-3">
+                    <!-- Dinámico por JS -->
+                </div>
+
+                <div id="quizRetroalimentacion" class="hidden p-4 rounded-xl text-sm font-medium"></div>
+
+                <div class="flex justify-end pt-4 border-t border-dark-700">
+                    <button id="btnSiguientePregunta" onclick="siguientePregunta()" class="hidden bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-cyan-900/40">
+                        Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark-900 border-t border-dark-700 py-6 mt-12 text-center text-xs text-slate-400">
+        <p>Aplicación Educativa Interactiva de Mecánica Básica &copy; 2024-2025 | Docente: Ldo. Pablo Ramos</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Estado Global y LocalStorage
+        let appState = {
+            xp: 100,
+            nivel: 1,
+            modulosCompletados: []
+        };
+
+        // Cargar estado guardado
+        window.addEventListener('DOMContentLoaded', () => {
+            const guardado = localStorage.getItem('mecanica_app_state');
+            if (guardado) {
+                appState = JSON.parse(guardado);
+            }
+            actualizarUIStats();
+        });
+
+        function guardarEstado() {
+            localStorage.setItem('mecanica_app_state', JSON.stringify(appState));
+            actualizarUIStats();
+        }
+
+        function actualizarUIStats() {
+            document.getElementById('userXP').textContent = appState.xp;
+            document.getElementById('userLevel').textContent = appState.nivel;
+        }
+
+        function mostrarNotificacion(texto) {
+            const banner = document.getElementById('notificationBanner');
+            document.getElementById('notificationText').textContent = texto;
+            banner.classList.remove('hidden');
+            setTimeout(() => {
+                banner.classList.add('hidden');
+            }, 4000);
+        }
+
+        function ocultarNotificacion() {
+            document.getElementById('notificationBanner').classList.add('hidden');
+        }
+
+        function reiniciarProgreso() {
+            if (confirm("¿Estás seguro de reiniciar tu progreso y XP acumulado?")) {
+                appState = { xp: 100, nivel: 1, modulosCompletados: [] };
+                guardarEstado();
+                mostrarNotificacion("Progreso reiniciado correctamente.");
+            }
+        }
+
+        // Navegación entre pestañas
+        function cambiarModulo(num) {
+            document.querySelectorAll('.module-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-cyan-600', 'text-white', 'shadow-lg', 'shadow-cyan-900/50');
+                btn.classList.add('bg-dark-800', 'text-slate-400', 'hover:bg-dark-700', 'hover:text-white');
+            });
+
+            document.getElementById(`modulo-${num}`).classList.remove('hidden');
+            const activeTab = document.getElementById(`tab-${num}`);
+            activeTab.classList.remove('bg-dark-800', 'text-slate-400', 'hover:bg-dark-700', 'hover:text-white');
+            activeTab.classList.add('bg-cyan-600', 'text-white', 'shadow-lg', 'shadow-cyan-900/50');
+        }
+
+        // Módulo 1: Datos de Testigos
+        const testigosData = {
+            temperatura: {
+                icono: '🌡️',
+                titulo: 'Temperatura del Motor',
+                teoria: 'Monitorea la temperatura del líquido refrigerante. El rango óptimo de funcionamiento se encuentra entre 80°C y 100°C.',
+                falla: 'Fuga en mangueras, nivel bajo de refrigerante o fallo en el termostato y electroventilador.',
+                accion: 'Apagar el motor inmediatamente. NUNCA abrir la tapa del radiador en caliente (riesgo de quemaduras severas por vapor).'
+            },
+            aceite: {
+                icono: '🛢️',
+                titulo: 'Presión de Aceite',
+                teoria: 'Indica la correcta lubricación de las piezas móviles internas mediante la bomba de aceite y la viscosidad adecuada.',
+                falla: 'Bajo nivel de aceite, bomba defectuosa o desgaste interno severo.',
+                accion: 'Apagar el motor de inmediato y revisar el nivel de aceite con la varilla medidora antes de intentar encenderlo nuevamente.'
+            },
+            bateria: {
+                icono: '🔋',
+                titulo: 'Batería / Sistema de Carga',
+                teoria: 'Indica el voltaje suministrado por el alternador para mantener cargada la batería y alimentar los sistemas eléctricos.',
+                falla: 'Correa del alternador rota o floja, alternador defectuoso o batería al final de su vida útil.',
+                accion: 'Reducir el consumo eléctrico (apagar aire acondicionado, radio) y acudir al taller para revisión del sistema de carga.'
+            },
+            frenos: {
+                icono: '🛑',
+                titulo: 'Sistema de Frenos / Freno de Mano',
+                teoria: 'Garantiza la presión hidráulica adecuada para la detención segura y advierte si el freno de estacionamiento está activado.',
+                falla: 'Fuga de líquido de frenos, pastillas extremadamente desgastadas o nivel bajo en el depósito.',
+                accion: 'Detener el vehículo de forma segura y verificar el depósito de líquido de frenos y la liberación total del freno de mano.'
+            }
+        };
+
+        function seleccionarTestigo(tipo) {
+            document.querySelectorAll('.testigo-btn').forEach(btn => {
+                btn.classList.remove('border-cyan-500', 'bg-cyan-950/40');
+                btn.classList.add('border-dark-700', 'bg-dark-800');
+            });
+            const selBtn = document.getElementById(`btn-${tipo}`);
+            selBtn.classList.remove('border-dark-700', 'bg-dark-800');
+            selBtn.classList.add('border-cyan-500', 'bg-cyan-950/40');
+
+            const data = testigosData[tipo];
+            document.getElementById('detalleIcono').textContent = data.icono;
+            document.getElementById('detalleTitulo').textContent = data.titulo;
+            document.getElementById('detalleTeoria').textContent = data.teoria;
+            document.getElementById('detalleFalla').textContent = data.falla;
+            document.getElementById('detalleAccion').textContent = data.accion;
+        }
+
+        // Completar sección y ganar XP
+        function completarSeccion(num) {
+            if (!appState.modulosCompletados.includes(num)) {
+                appState.modulosCompletados.push(num);
+                appState.xp += 20;
+                if (appState.xp >= appState.nivel * 150) {
+                    appState.nivel += 1;
+                }
+                guardarEstado();
+                mostrarNotificacion(`¡Módulo ${num} completado! +20 XP ganados.`);
+            } else {
+                mostrarNotificacion(`Ya habías completado el Módulo ${num}.`);
+            }
+        }
+
+        // Módulo 3: Calculadora de Mantenimiento
+        function calcularMantenimiento() {
+            const km = parseInt(document.getElementById('inputKm').value);
+            const resDiv = document.getElementById('resultadoMantenimiento');
+
+            if (isNaN(km) || km < 0) {
+                resDiv.innerHTML = '<span class="text-red-400">Por favor, ingrese un valor de kilometraje válido.</span>';
+                return;
+            }
+
+            let mants = [];
+            if (km >= 2500) mants.push("Cambio de aceite de motor y revisión general de niveles.");
+            if (km >= 5000) mants.push("Alineación y balanceo de neumáticos.");
+            if (km >= 10000) mants.push("Cambio de filtro de aire y rotación de neumáticos.");
+            if (km >= 40000) mants.push("Cambio completo de líquido de frenos y revisión de pastillas/discos.");
+
+            if (mants.length === 0) {
+                resDiv.innerHTML = `<span class="text-cyan-400">Kilometraje bajo (${km} Km): El vehículo se encuentra en período óptimo de uso rutinario. Mantenga revisiones visuales básicas.</span>`;
+            } else {
+                let htmlList = `<ul class="text-left space-y-1 text-slate-200">`;
+                mants.forEach(m => htmlList += `<li><i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i>${m}</li>`);
+                htmlList += `</ul>`;
+                resDiv.innerHTML = htmlList;
+            }
+        }
+
+        // Módulo 6: Trivia Gamificada
+        const preguntasTrivia = [
+            {
+                pregunta: "¿Qué rango de temperatura es considerado óptimo para el funcionamiento del motor según los módulos de refrigeración?",
+                opciones: ["40°C a 60°C", "80°C a 100°C", "120°C a 140°C"],
+                correcta: 1,
+                explicacion: "El sistema de refrigeración mantiene el motor trabajando de manera eficiente entre 80°C y 100°C."
+            },
+            {
+                pregunta: "¿En qué fase del motor se produce la chispa de la bujía que genera la fuerza motriz al empujar el pistón hacia abajo?",
+                opciones: ["Admisión", "Compresión", "Explosión / Trabajo"],
+                correcta: 2,
+                explicacion: "En la fase de explosión o trabajo, la mezcla comprimida arde y genera la potencia necesaria para el movimiento."
+            },
+            {
+                pregunta: "Si experimenta vibraciones en el volante al conducir entre 60 y 80 Km/h, ¿qué componente requiere atención prioritaria?",
+                opciones: ["Balanceo de neumáticos", "Filtro de combustible", "Convertidor catalítico"],
+                correcta: 0,
+                explicacion: "El desbalanceo de las ruedas delanteras genera vibraciones molestas precisamente en ese rango de velocidad."
+            },
+            {
+                pregunta: "¿Cuál es la recomendación de seguridad crítica si el motor se ha recalentado?",
+                opciones: ["Abrir inmediatamente la tapa del radiador", "NUNCA abrir la tapa del radiador en caliente", "Echar agua fría directo al monoblock"],
+                correcta: 1,
+                explicacion: "Abrir la tapa del radiador en caliente puede causar proyecciones de vapor hirviendo y quemaduras severas."
+            },
+            {
+                pregunta: "¿Qué instrumento técnico se utiliza para medir la opacidad de los gases de escape?",
+                opciones: ["Multímetro", "Opacímetro", "Torquímetro"],
+                correcta: 1,
+                explicacion: "El opacímetro mide la concentración de humo y partículas suspendidas en los gases de escape según la normativa ambiental."
+            }
+        ];
+
+        let preguntaActualIdx = 0;
+        let puntajeQuiz = 0;
+
+        function cargarPreguntaTrivia() {
+            if (preguntaActualIdx >= preguntasTrivia.length) {
+                document.getElementById('quizContainer').innerHTML = `
+                    <div class="text-center space-y-4 py-8">
+                        <i class="fa-solid fa-award text-5xl text-amber-400"></i>
+                        <h3 class="text-2xl font-bold text-white">¡Trivia Completada!</h3>
+                        <p class="text-slate-300">Has obtenido <strong class="text-cyan-400">${puntajeQuiz} / ${preguntasTrivia.length * 20} pts</strong>.</p>
+                        <button onclick="reiniciarTrivia()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition">
+                            Volver a Intentar
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const p = preguntasTrivia[preguntaActualIdx];
+            document.getElementById('quizPreguntaNum').textContent = `Pregunta ${preguntaActualIdx + 1} de ${preguntasTrivia.length}`;
+            document.getElementById('quizPuntajeActual').textContent = `Puntaje: ${puntajeQuiz} pts`;
+            document.getElementById('quizPreguntaTexto').textContent = p.pregunta;
+
+            const opcionesDiv = document.getElementById('quizOpciones');
+            opcionesDiv.innerHTML = '';
+            p.opciones.forEach((op, idx) => {
+                opcionesDiv.innerHTML += `
+                    <button onclick="verificarRespuesta(${idx})" class="w-full text-left bg-dark-950 hover:bg-dark-800 border border-dark-700 p-4 rounded-xl text-sm text-slate-200 transition opc-btn flex items-center justify-between">
+                        <span>${op}</span>
+                        <i class="fa-regular fa-circle text-slate-500"></i>
+                    </button>
+                `;
+            });
+
+            document.getElementById('quizRetroalimentacion').classList.add('hidden');
+            document.getElementById('btnSiguientePregunta').classList.add('hidden');
+        }
+
+        function verificarRespuesta(idxSeleccionada) {
+            const p = preguntasTrivia[preguntaActualIdx];
+            const retroDiv = document.getElementById('quizRetroalimentacion');
+            retroDiv.classList.remove('hidden');
+
+            const botones = document.querySelectorAll('.opc-btn');
+            botones.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === p.correcta) {
+                    btn.classList.add('border-emerald-500', 'bg-emerald-950/40', 'text-emerald-200');
+                } else if (idx === idxSeleccionada && idx !== p.correcta) {
+                    btn.classList.add('border-red-500', 'bg-red-950/40', 'text-red-200');
+                }
+            });
+
+            if (idxSeleccionada === p.correcta) {
+                puntajeQuiz += 20;
+                appState.xp += 10;
+                guardarEstado();
+                retroDiv.className = 'p-4 rounded-xl text-sm font-medium bg-emerald-950/80 border border-emerald-500 text-emerald-200';
+                retroDiv.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> ¡Correcto! ${p.explicacion} (+10 XP)`;
+            } else {
+                retroDiv.className = 'p-4 rounded-xl text-sm font-medium bg-red-950/80 border border-red-500 text-red-200';
+                retroDiv.innerHTML = `<i class="fa-solid fa-circle-xmark mr-2"></i> Incorrecto. ${p.explicacion}`;
+            }
+
+            document.getElementById('btnSiguientePregunta').classList.remove('hidden');
+        }
+
+        function siguientePregunta() {
+            preguntaActualIdx++;
+            cargarPreguntaTrivia();
+        }
+
+        function reiniciarTrivia() {
+            preguntaActualIdx = 0;
+            puntajeQuiz = 0;
+            // Restaurar estructura original del quiz en HTML si es necesario o recargar vista
+            location.reload();
+        }
+
+        // Inicializar Trivia al cargar
+        cargarPreguntaTrivia();
+    </script>
+</body>
+</html>
